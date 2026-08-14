@@ -227,7 +227,7 @@ export class HalfYearlyConfigComponent implements OnInit {
     this.configService.updateHalfYearly(this.schoolId, this.selectedClass(), this.selectedSubject(), formula).subscribe({
       next: (config) => {
         this.applyConfig(config);
-        this.status.set({ kind: 'ok', message: 'Saved — Half Yearly now recomputes with this formula.' });
+        this.status.set({ kind: 'ok', message: 'Saved — First Half now recomputes with this formula.' });
       },
       error: (err) => {
         this.status.set({ kind: 'error', message: err?.error?.error ?? 'Failed to save' });
