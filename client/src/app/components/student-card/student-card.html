@@ -1,0 +1,42 @@
+<div class="overlay" (click)="closed.emit()">
+  <div class="card" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closed.emit()" aria-label="Close">&times;</button>
+
+    <h2>{{ schoolName }}</h2>
+    <p class="subtitle">Report Card</p>
+
+    <dl class="meta">
+      <dt>Student</dt>
+      <dd>{{ studentName }}</dd>
+      <dt>Class</dt>
+      <dd>{{ klass }}</dd>
+      <ng-container *ngIf="term">
+        <dt>Term</dt>
+        <dd>{{ term }}</dd>
+      </ng-container>
+    </dl>
+
+    <div class="table-wrap" *ngIf="headerScheme as headerSch">
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th *ngFor="let component of headerSch.reportComponents">{{ component.label }}</th>
+            <th>Total</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows">
+            <td>{{ row.subject }}</td>
+            <td *ngFor="let component of componentsForRow(row)">
+              {{ row.computed.components[component.key] }}
+            </td>
+            <td>{{ row.computed.total }}</td>
+            <td>{{ row.computed.grade }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

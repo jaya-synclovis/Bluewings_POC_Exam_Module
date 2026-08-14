@@ -1,0 +1,191 @@
+<div class="panel" *ngIf="selectedConfig as sel">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Credit Score Configuration</p>
+      <p class="hint">
+        The formula (and which fields feed it) can differ per subject AND per class — Credit Score itself is the
+        only thing that ever appears in the report card.
+      </p>
+    </div>
+    <div class="header-actions">
+      <label class="field subject-select">
+        Class
+        <select [ngModel]="selectedClass()" (ngModelChange)="onClassChange($event)">
+          <option *ngFor="let c of classes()" [value]="c">{{ c }}</option>
+        </select>
+      </label>
+      <label class="field subject-select">
+        Subject
+        <select [ngModel]="selectedSubject()" (ngModelChange)="onSubjectChange($event)">
+          <option *ngFor="let c of configs()" [value]="c.subject">{{ c.subject }}</option>
+        </select>
+      </label>
+      <span *ngIf="status() as st" class="status" [class.ok]="st.kind === 'ok'" [class.error]="st.kind === 'error'">
+        {{ st.message }}
+      </span>
+      <button type="button" class="save-btn" [disabled]="!dirty()" (click)="save()">
+        {{ dirty() ? 'Save changes' : 'Saved' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="type-toggle">
+    <label class="type-option" [class.active]="formulaType() === 'sum'">
+      <input type="radio" name="cs-type" [checked]="formulaType() === 'sum'" (change)="onTypeChange('sum')" />
+      Sum
+    </label>
+    <label class="type-option" [class.active]="formulaType() === 'percentOf'">
+      <input type="radio" name="cs-type" [checked]="formulaType() === 'percentOf'" (change)="onTypeChange('percentOf')" />
+      Percentage
+    </label>
+    <label class="type-option" [class.active]="formulaType() === 'linearCombination'">
+      <input
+        type="radio"
+        name="cs-type"
+        [checked]="formulaType() === 'linearCombination'"
+        (change)="onTypeChange('linearCombination')"
+      />
+      Weighted combination
+    </label>
+  </div>
+
+  <div class="formula-body" *ngIf="formulaType() === 'sum'">
+    <p class="hint">{{ sel.component.label }} = sum of the selected fields' raw values.</p>
+    <div class="leaf-keys">
+      <label *ngFor="let f of sel.availableFields" class="key-checkbox">
+        <input type="checkbox" [checked]="isSumFieldSelected(f.key)" (change)="toggleSumField(f.key, $event)" />
+        {{ f.label }}
+      </label>
+    </div>
+  </div>
+
+  <div class="formula-body" *ngIf="formulaType() === 'percentOf'">
+    <label class="field">
+      Base field
+      <select [ngModel]="percentOfDraft().of" (ngModelChange)="onPercentOfBaseChange($event)">
+        <option value="" disabled>Select a field</option>
+        <option *ngFor="let f of sel.availableFields" [value]="f.key">{{ f.label }}</option>
+      </select>
+    </label>
+    <label class="field">
+      Percent
+      <span class="percent-input">
+        <input type="number" min="0" max="200" [ngModel]="percentOfDraft().percent" (ngModelChange)="onPercentOfPercentChange($event)" />
+        <span>%</span>
+      </span>
+    </label>
+  </div>
+
+  <div class="formula-body" *ngIf="formulaType() === 'linearCombination'">
+    <p class="hint">{{ sel.component.label }} = weighted sum of the selected fields' raw values.</p>
+    <div class="weighted-fields">
+      <div *ngFor="let f of sel.availableFields" class="weighted-field-row">
+        <label class="key-checkbox">
+          <input type="checkbox" [checked]="isLinearFieldSelected(f.key)" (change)="toggleLinearField(f.key, $event)" />
+          {{ f.label }}
+        </label>
+        <span class="percent-input" *ngIf="isLinearFieldSelected(f.key)">
+          <input
+            type="number"
+            [ngModel]="getLinearWeight(f.key)"
+            (ngModelChange)="onLinearWeightChange(f.key, $event)"
+          />
+          <span>%</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="fields-panel">
+    <h3>Input fields</h3>
+    <p class="hint">
+      Each field is an ordinary editable column in Marks Entry — {{ sel.component.label }} is the only thing that
+      ever appears in the Report Card. "Manual" fields start blank for the teacher to fill in; "Bluewings" fields
+      start pre-filled with a value simulating an auto-fetched external system, still editable/overridable there.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of sel.availableFields">
+          <td>
+            {{ f.label }}
+            <span class="scope-badge" *ngIf="f.scope === 'subject'">{{ f.subjectName }} only</span>
+          </td>
+          <td>
+            <label class="radio-inline">
+              <input
+                type="radio"
+                [name]="'source-' + f.key"
+                [checked]="f.source === 'manual'"
+                (change)="onSourceChange(f, 'manual')"
+              />
+              Manual entry
+            </label>
+            <label class="radio-inline">
+              <input
+                type="radio"
+                [name]="'source-' + f.key"
+                [checked]="f.source === 'bluewings'"
+                (change)="onSourceChange(f, 'bluewings')"
+              />
+              From Bluewings
+            </label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="new-field-form">
+      <h4>+ Add a new field</h4>
+      <div class="new-field-row">
+        <label class="field">
+          Name
+          <input
+            type="text"
+            placeholder="e.g. Cleanliness"
+            [ngModel]="newField().name"
+            (ngModelChange)="onNewFieldChange({ name: $event })"
+          />
+        </label>
+        <label class="field">
+          Max marks
+          <input
+            type="number"
+            min="1"
+            [ngModel]="newField().maxMarks"
+            (ngModelChange)="onNewFieldChange({ maxMarks: $event })"
+          />
+        </label>
+        <label class="field">
+          Scope
+          <select [ngModel]="newField().scope" (ngModelChange)="onNewFieldChange({ scope: $event })">
+            <option value="global">Global (any subject)</option>
+            <option value="subject">One subject only</option>
+          </select>
+        </label>
+        <label class="field" *ngIf="newField().scope === 'subject'">
+          Subject
+          <select [ngModel]="newField().subjectName" (ngModelChange)="onNewFieldChange({ subjectName: $event })">
+            <option *ngFor="let c of configs()" [value]="c.subject">{{ c.subject }}</option>
+          </select>
+        </label>
+        <label class="field">
+          Source
+          <select [ngModel]="newField().source" (ngModelChange)="onNewFieldChange({ source: $event })">
+            <option value="manual">Manual entry</option>
+            <option value="bluewings">From Bluewings</option>
+          </select>
+        </label>
+        <button type="button" class="save-btn" (click)="addField()">Add field</button>
+      </div>
+      <span *ngIf="newFieldStatus() as st" class="status" [class.ok]="st.kind === 'ok'" [class.error]="st.kind === 'error'">
+        {{ st.message }}
+      </span>
+    </div>
+  </div>
+</div>

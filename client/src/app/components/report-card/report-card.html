@@ -1,0 +1,112 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Marks Entry</p>
+      <h2 *ngIf="selectedSchool as school">{{ school.name }}</h2>
+    </div>
+  </div>
+
+  <div class="selectors">
+    <label *ngIf="selectedSchool as school">
+      Class
+      <select [ngModel]="selectedClass()" (ngModelChange)="onClassChange($event)">
+        <option *ngFor="let klass of school.classes" [value]="klass">{{ klass }}</option>
+      </select>
+    </label>
+
+    <label>
+      Student
+      <select [ngModel]="selectedStudentId()" (ngModelChange)="onStudentChange($event)">
+        <option *ngFor="let student of studentOptions()" [value]="student.id">{{ student.name }}</option>
+      </select>
+    </label>
+
+    <!-- Only rendered for schools whose schemes are actually term-tagged. -->
+    <label *ngIf="selectedSchool as school">
+      <ng-container *ngIf="school.terms.length">
+        Term
+        <select [ngModel]="selectedTerm()" (ngModelChange)="onTermChange($event)">
+          <option *ngFor="let term of school.terms" [value]="term">{{ term }}</option>
+        </select>
+      </ng-container>
+    </label>
+
+    <button type="button" class="report-card-btn" [disabled]="!subjectRows().length" (click)="openReportCard()">
+      Report Card
+    </button>
+  </div>
+
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+
+  <div class="table-card">
+    <table *ngIf="headerScheme as headerSch">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <!-- Column set is the union (by LABEL) of every subject's own
+               components — no column name is ever hardcoded here. Two
+               subjects can share a label with a genuinely different
+               underlying component (e.g. each subject's own Credit Score
+               field) — those merge into one column, resolved per-row via
+               rowComponentForLabel(). A label only one subject has (e.g.
+               Discipline) stays its own column, blank for other subjects. -->
+          <th *ngFor="let column of entryComponents">
+            {{ column.label }}
+            <span class="max">/ {{ column.max }}</span>
+          </th>
+          <th>Total</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of subjectRows()">
+          <td class="subject-cell">{{ row.subject }}</td>
+          <td *ngFor="let column of entryComponents">
+            <ng-container *ngIf="rowComponentForLabel(row, column.label) as component; else notApplicable">
+              <input
+                *ngIf="component.type === 'direct'; else calculatedCell"
+                type="number"
+                min="0"
+                [max]="component.max"
+                [ngModel]="row.marks[component.key]"
+                (change)="onMarkChange(row, component, $event)"
+              />
+              <ng-template #calculatedCell>
+                <span class="calculated-cell" title="Calculated from config formula — not directly editable">
+                  {{ row.computed.components[component.key] }}
+                  <span class="auto-badge">auto</span>
+                </span>
+              </ng-template>
+            </ng-container>
+            <ng-template #notApplicable>
+              <span class="not-applicable" title="Not applicable to this subject">&mdash;</span>
+            </ng-template>
+          </td>
+          <td class="total-cell">{{ row.computed.total }}</td>
+          <td class="grade-cell">
+            <!-- Defaults to the auto-computed grade; a teacher can pick a different one to override it. -->
+            <select [ngModel]="row.computed.grade" (change)="onGradeChange(row, $event)">
+              <option *ngFor="let g of headerSch.gradeScale" [value]="g.grade">{{ g.grade }}</option>
+            </select>
+            <span *ngIf="row.computed.gradeOverridden" class="manual-badge" title="Manually overridden">manual</span>
+          </td>
+        </tr>
+        <tr *ngIf="!subjectRows().length">
+          <td [attr.colspan]="entryComponents.length + 3">No data found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<ng-container *ngIf="showReportCard() && headerScheme">
+  <app-student-card
+    [schoolName]="selectedSchool?.name ?? ''"
+    [studentName]="selectedStudentName"
+    [klass]="selectedClass()"
+    [term]="selectedTerm() || null"
+    [schemesBySubject]="schemesBySubject()"
+    [rows]="subjectRows()"
+    (closed)="closeReportCard()"
+  ></app-student-card>
+</ng-container>

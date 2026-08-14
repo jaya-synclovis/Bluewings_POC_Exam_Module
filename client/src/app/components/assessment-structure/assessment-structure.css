@@ -1,0 +1,24 @@
+.page-header {
+  margin-bottom: 0.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a7f9a;
+  font-weight: 700;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #1e1e2e;
+}
+
+.hint {
+  color: #8a8fa8;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+}

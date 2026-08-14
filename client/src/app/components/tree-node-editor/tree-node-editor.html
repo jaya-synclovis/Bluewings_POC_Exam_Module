@@ -1,0 +1,57 @@
+<div class="node" [class.is-group]="isGroup" [class.is-leaf]="!isGroup" [class.is-root]="isRoot">
+  <div class="node-header">
+    <span class="weight-badge" *ngIf="isRoot">FINAL 100%</span>
+
+    <label class="weight-input" *ngIf="!isRoot">
+      <input type="number" min="0" max="100" [ngModel]="weightPercent" (ngModelChange)="onWeightChange($event)" />
+      <span>%</span>
+    </label>
+
+    <input
+      class="label-input"
+      type="text"
+      [ngModel]="node.label"
+      (ngModelChange)="onLabelChange($event)"
+      [placeholder]="isGroup ? 'Group name' : 'Exam name'"
+    />
+
+    <span class="type-chip">{{ isGroup ? 'Group' : 'Exam' }}</span>
+
+    <button *ngIf="!isRoot" type="button" class="icon-btn" title="Remove" (click)="removed.emit()">&times;</button>
+  </div>
+
+  <!-- Leaf: pick which of the school's direct components feed this exam. -->
+  <div *ngIf="!isGroup" class="leaf-keys">
+    <label *ngFor="let component of availableComponents" class="key-checkbox">
+      <input
+        type="checkbox"
+        [checked]="isKeySelected(component.key)"
+        (change)="toggleKey(component.key, $event)"
+      />
+      {{ component.label }}
+    </label>
+    <span *ngIf="!availableComponents.length" class="hint">No direct components available.</span>
+  </div>
+
+  <!-- Group: nested children, each edited by another instance of this same component. -->
+  <div *ngIf="isGroup" class="children">
+    <app-tree-node-editor
+      *ngFor="let child of groupNode.children; let i = index"
+      [node]="child"
+      [availableComponents]="availableComponents"
+      (dirty)="dirty.emit()"
+      (removed)="removeChildAt(i)"
+    ></app-tree-node-editor>
+
+    <div class="group-actions">
+      <button type="button" (click)="addExam()">+ Add Exam</button>
+      <button type="button" (click)="addGroup()">+ Add Group</button>
+      <button type="button" (click)="distributeEvenly()">Distribute evenly</button>
+      <span class="weight-sum" [class.ok]="childrenWeightSumOk" [class.bad]="!childrenWeightSumOk">
+        {{ (childrenWeightSum * 100) | number: '1.0-1' }}%
+        <span *ngIf="childrenWeightSumOk">&#10003;</span>
+        <span *ngIf="!childrenWeightSumOk">&#9888;</span>
+      </span>
+    </div>
+  </div>
+</div>

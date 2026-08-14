@@ -1,0 +1,113 @@
+<div class="panel" *ngIf="config() as cfg">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Half Yearly Configuration</p>
+      <p class="hint">Choose how {{ cfg.component.label }} is auto-calculated — its value is never typed in directly.</p>
+    </div>
+    <div class="header-actions">
+      <label class="field class-select">
+        Class
+        <select [ngModel]="selectedClass()" (ngModelChange)="onClassChange($event)">
+          <option *ngFor="let c of classes()" [value]="c">{{ c }}</option>
+        </select>
+      </label>
+      <label class="field class-select">
+        Subject
+        <select [ngModel]="selectedSubject()" (ngModelChange)="onSubjectChange($event)">
+          <option *ngFor="let s of subjects()" [value]="s">{{ s }}</option>
+        </select>
+      </label>
+      <span *ngIf="status() as st" class="status" [class.ok]="st.kind === 'ok'" [class.error]="st.kind === 'error'">
+        {{ st.message }}
+      </span>
+      <button type="button" class="save-btn" [disabled]="!dirty()" (click)="save()">
+        {{ dirty() ? 'Save changes' : 'Saved' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="type-toggle">
+    <label class="type-option" [class.active]="formulaType() === 'linearCombination'">
+      <input
+        type="radio"
+        name="hy-type"
+        [checked]="formulaType() === 'linearCombination'"
+        (change)="onTypeChange('linearCombination')"
+      />
+      Weighted %
+    </label>
+    <label class="type-option" [class.active]="formulaType() === 'average'">
+      <input type="radio" name="hy-type" [checked]="formulaType() === 'average'" (change)="onTypeChange('average')" />
+      Average
+    </label>
+    <label class="type-option" [class.active]="formulaType() === 'sum'">
+      <input type="radio" name="hy-type" [checked]="formulaType() === 'sum'" (change)="onTypeChange('sum')" />
+      Total
+    </label>
+    <label class="type-option" [class.active]="formulaType() === 'bestOfN'">
+      <input type="radio" name="hy-type" [checked]="formulaType() === 'bestOfN'" (change)="onTypeChange('bestOfN')" />
+      Best of N
+    </label>
+  </div>
+
+  <!-- Weighted %: e.g. 10% of PT + 15% of MA — any number of fields, each with its own weight. -->
+  <div class="formula-body" *ngIf="formulaType() === 'linearCombination'">
+    <p class="hint">{{ cfg.component.label }} = sum of each selected field's value &times; its own percentage.</p>
+    <div class="weighted-fields">
+      <div *ngFor="let c of availableComponents" class="weighted-field-row">
+        <label class="key-checkbox">
+          <input type="checkbox" [checked]="isLinearFieldSelected(c.key)" (change)="toggleLinearField(c.key, $event)" />
+          {{ c.label }}
+        </label>
+        <span class="percent-input" *ngIf="isLinearFieldSelected(c.key)">
+          <input type="number" [ngModel]="getLinearWeight(c.key)" (ngModelChange)="onLinearWeightChange(c.key, $event)" />
+          <span>%</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Average: plain mean of the selected fields' raw values. -->
+  <div class="formula-body" *ngIf="formulaType() === 'average'">
+    <p class="hint">{{ cfg.component.label }} = average of the selected fields' raw values.</p>
+    <div class="leaf-keys">
+      <label *ngFor="let c of availableComponents" class="key-checkbox">
+        <input type="checkbox" [checked]="isAverageFieldSelected(c.key)" (change)="toggleAverageField(c.key, $event)" />
+        {{ c.label }}
+      </label>
+    </div>
+  </div>
+
+  <!-- Total: sum of the selected fields' raw values. -->
+  <div class="formula-body" *ngIf="formulaType() === 'sum'">
+    <p class="hint">{{ cfg.component.label }} = sum of the selected fields' raw values.</p>
+    <div class="leaf-keys">
+      <label *ngFor="let c of availableComponents" class="key-checkbox">
+        <input type="checkbox" [checked]="isSumFieldSelected(c.key)" (change)="toggleSumField(c.key, $event)" />
+        {{ c.label }}
+      </label>
+    </div>
+  </div>
+
+  <div class="formula-body" *ngIf="formulaType() === 'bestOfN'">
+    <div class="leaf-keys">
+      <label *ngFor="let c of availableComponents" class="key-checkbox">
+        <input type="checkbox" [checked]="isBestOfNKeySelected(c.key)" (change)="toggleBestOfNKey(c.key, $event)" />
+        {{ c.label }}
+      </label>
+    </div>
+    <div class="best-of-n-row">
+      <label class="field">
+        Take best
+        <input type="number" min="1" [max]="bestOfNDraft().of.length || 1" [ngModel]="bestOfNDraft().n" (ngModelChange)="onBestOfNChange($event)" />
+      </label>
+      <label class="normalize-toggle">
+        <input type="checkbox" [ngModel]="bestOfNDraft().normalize" (ngModelChange)="onNormalizeChange($event)" />
+        Normalize each to % of its max before averaging
+      </label>
+    </div>
+    <p class="hint" *ngIf="!bestOfNDraft().normalize">
+      Without normalizing, fields with different max marks are averaged as raw numbers — only fair if their maxes match.
+    </p>
+  </div>
+</div>

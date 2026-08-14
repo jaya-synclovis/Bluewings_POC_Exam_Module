@@ -1,0 +1,168 @@
+.node {
+  border: 1px solid #e2e4ec;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.6rem;
+  background: #fff;
+}
+
+.node.is-group {
+  background: #f8f9fd;
+}
+
+.node.is-root {
+  border: 1px solid #c7d2fe;
+  background: #eef1ff;
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.weight-badge {
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+.weight-input {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: #fff;
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  padding: 0.1rem 0.4rem;
+}
+
+.weight-input input {
+  width: 3rem;
+  border: none;
+  text-align: right;
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+.weight-input input:focus {
+  outline: none;
+}
+
+.weight-input span {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.label-input {
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-weight: 600;
+  color: #222;
+  background: transparent;
+}
+
+.label-input:hover,
+.label-input:focus {
+  border-color: #d7d9e4;
+  background: #fff;
+  outline: none;
+}
+
+.type-chip {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #7a7f9a;
+  background: #eceefa;
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+}
+
+.icon-btn {
+  border: none;
+  background: none;
+  color: #b34;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+.icon-btn:hover {
+  background: #fdecec;
+}
+
+.leaf-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin-top: 0.6rem;
+  padding-left: 0.2rem;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.key-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.hint {
+  color: #999;
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.children {
+  margin-top: 0.6rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid #e2e4ec;
+}
+
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.group-actions button {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  color: #444;
+}
+
+.group-actions button:hover {
+  background: #f3f4f9;
+}
+
+.weight-sum {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+}
+
+.weight-sum.ok {
+  color: #1a7f37;
+  background: #e6f6ea;
+}
+
+.weight-sum.bad {
+  color: #b34700;
+  background: #fff1e6;
+}

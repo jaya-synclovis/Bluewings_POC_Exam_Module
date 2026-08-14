@@ -1,0 +1,260 @@
+.panel {
+  background: #fff;
+  border: 1px solid #e2e4ec;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a7f9a;
+  font-weight: 700;
+}
+
+.hint {
+  color: #8a8fa8;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+  max-width: 60ch;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.subject-select {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a4f6a;
+}
+
+.subject-select select {
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #1e1e2e;
+}
+
+.status {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status.ok {
+  color: #1a7f37;
+}
+
+.status.error {
+  color: #b00020;
+}
+
+.save-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn:disabled {
+  background: #cfd2e8;
+  cursor: default;
+}
+
+.type-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.type-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #d7d9e4;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a4f6a;
+  cursor: pointer;
+}
+
+.type-option.active {
+  border-color: #4f46e5;
+  background: #eef0fd;
+  color: #4f46e5;
+}
+
+.formula-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a4f6a;
+  max-width: 260px;
+}
+
+.field select,
+.field input[type='number'] {
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #1e1e2e;
+}
+
+.percent-input {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.percent-input input {
+  width: 80px;
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  padding: 0.3rem 0.4rem;
+}
+
+.leaf-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+}
+
+.key-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: #1e1e2e;
+}
+
+.weighted-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.weighted-field-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fields-panel {
+  border-top: 1px solid #edeef5;
+  padding-top: 1rem;
+}
+
+.fields-panel h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  color: #1e1e2e;
+}
+
+.fields-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.fields-panel th,
+.fields-panel td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #edeef5;
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+.fields-panel th {
+  color: #7a7f9a;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.scope-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #8a5a00;
+  background: #fff3d6;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.radio-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  margin-right: 1rem;
+  color: #1e1e2e;
+}
+
+.new-field-form {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #edeef5;
+}
+
+.new-field-form h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #1e1e2e;
+}
+
+.new-field-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.new-field-row .field {
+  max-width: 160px;
+}
+
+.new-field-row input[type='text'] {
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #1e1e2e;
+}

@@ -1,0 +1,168 @@
+.page-header {
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a7f9a;
+  font-weight: 700;
+}
+
+.page h2 {
+  margin: 0;
+  color: #1e1e2e;
+}
+
+.selectors {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.selectors label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5b5f78;
+  gap: 0.3rem;
+}
+
+.selectors select {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d7d9e4;
+  border-radius: 8px;
+  background: #fff;
+  color: #1e1e2e;
+}
+
+.report-card-btn {
+  background: #fff;
+  color: #4f46e5;
+  border: 1px solid #4f46e5;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.report-card-btn:hover:not(:disabled) {
+  background: #eef1ff;
+}
+
+.report-card-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.table-card {
+  background: #fff;
+  border: 1px solid #e2e4ec;
+  border-radius: 12px;
+  padding: 0.5rem;
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  padding: 0.65rem 0.9rem;
+  text-align: center;
+  border-bottom: 1px solid #eef0f6;
+}
+
+th {
+  color: #5b5f78;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 700;
+  background: #f8f9fd;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.subject-cell {
+  font-weight: 600;
+  color: #1e1e2e;
+  text-align: left;
+}
+
+.max {
+  color: #a3a7c2;
+  font-weight: normal;
+  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+input[type='number'] {
+  width: 3.5rem;
+  text-align: center;
+  padding: 0.3rem;
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+}
+
+.calculated-cell {
+  color: #5b5f78;
+  background: #eceefa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.auto-badge {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  background: #7a7f9a;
+  color: #fff;
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+}
+
+.total-cell {
+  font-weight: 700;
+  color: #1e1e2e;
+}
+
+.grade-cell select {
+  font-weight: 700;
+  color: #1a7f37;
+  border: 1px solid #d7d9e4;
+  border-radius: 6px;
+  padding: 0.25rem 0.4rem;
+}
+
+.manual-badge {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  background: #b06a00;
+  color: #fff;
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  margin-left: 0.3rem;
+}
+
+.error {
+  color: #b00020;
+  font-weight: 600;
+}
+
+.not-applicable {
+  color: #c3c6d8;
+}
