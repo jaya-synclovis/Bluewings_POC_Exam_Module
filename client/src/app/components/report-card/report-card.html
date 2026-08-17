@@ -41,6 +41,16 @@
   <div class="table-card">
     <table *ngIf="headerScheme as headerSch">
       <thead>
+        <!-- Dynamic group header row — e.g. "Half Yearly Exam" / "Annual
+             Exam" / "Final Assessment" — driven entirely by each column's
+             own `group`, never hardcoded here; consecutive columns sharing a
+             group collapse into one colspan cell (see headerGroups). -->
+        <tr class="group-row">
+          <th></th>
+          <th *ngFor="let group of headerGroups" [attr.colspan]="group.span" class="group-header">{{ group.label }}</th>
+          <th></th>
+          <th></th>
+        </tr>
         <tr>
           <th>Subject</th>
           <!-- Column set is the union (by LABEL) of every subject's own

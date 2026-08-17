@@ -102,6 +102,7 @@
       Each field is an ordinary editable column in Marks Entry — {{ sel.component.label }} is the only thing that
       ever appears in the Report Card. "Manual" fields start blank for the teacher to fill in; "Bluewings" fields
       start pre-filled with a value simulating an auto-fetched external system, still editable/overridable there.
+      Half Yearly/Annual are computed fields with no source to toggle.
     </p>
     <table>
       <thead>
@@ -117,24 +118,29 @@
             <span class="scope-badge" *ngIf="f.scope === 'subject'">{{ f.subjectName }} only</span>
           </td>
           <td>
-            <label class="radio-inline">
-              <input
-                type="radio"
-                [name]="'source-' + f.key"
-                [checked]="f.source === 'manual'"
-                (change)="onSourceChange(f, 'manual')"
-              />
-              Manual entry
-            </label>
-            <label class="radio-inline">
-              <input
-                type="radio"
-                [name]="'source-' + f.key"
-                [checked]="f.source === 'bluewings'"
-                (change)="onSourceChange(f, 'bluewings')"
-              />
-              From Bluewings
-            </label>
+            <ng-container *ngIf="f.source; else computedField">
+              <label class="radio-inline">
+                <input
+                  type="radio"
+                  [name]="'source-' + f.key"
+                  [checked]="f.source === 'manual'"
+                  (change)="onSourceChange(f, 'manual')"
+                />
+                Manual entry
+              </label>
+              <label class="radio-inline">
+                <input
+                  type="radio"
+                  [name]="'source-' + f.key"
+                  [checked]="f.source === 'bluewings'"
+                  (change)="onSourceChange(f, 'bluewings')"
+                />
+                From Bluewings
+              </label>
+            </ng-container>
+            <ng-template #computedField>
+              <span class="scope-badge">Computed field</span>
+            </ng-template>
           </td>
         </tr>
       </tbody>

@@ -12,13 +12,14 @@ const schemeComponents = require('./schemeComponents');
 const classSubjectSchemeMap = require('./classSubjectSchemeMap');
 
 const greenwoodNames = ['Aarav Shah', 'Priya Nair', 'Kabir Singh', 'Meera Iyer'];
-// ATT/DISC feed the (hidden) Credit Score formula — same values regardless
-// of subject, since attendance/discipline aren't subject-specific in reality.
+// ATT/DISC/CS_MARKS feed the (hidden) Credit Score formula — same values
+// regardless of subject, since attendance/discipline/entered-marks aren't
+// subject-specific in reality.
 const greenwoodPattern = [
-  { PT: 8, MA: 4, NBS_ATT: 4, SEA: 8, TE: 55, ATT: 9, DISC: 8 },
-  { PT: 6, MA: 3, NBS_ATT: 5, SEA: 7, TE: 60, ATT: 8, DISC: 9 },
-  { PT: 9, MA: 5, NBS_ATT: 3, SEA: 9, TE: 65, ATT: 10, DISC: 10 },
-  { PT: 5, MA: 2, NBS_ATT: 4, SEA: 6, TE: 45, ATT: 7, DISC: 7 },
+  { UT1: 15, HYE_TH: 60, HYE_PR: 16, UT2: 16, AE_TH: 64, AE_PR: 17, ATT: 9, CS_MARKS: 8, DISC: 8 },
+  { UT1: 13, HYE_TH: 55, HYE_PR: 15, UT2: 14, AE_TH: 58, AE_PR: 16, ATT: 8, CS_MARKS: 7, DISC: 9 },
+  { UT1: 18, HYE_TH: 68, HYE_PR: 18, UT2: 19, AE_TH: 70, AE_PR: 19, ATT: 10, CS_MARKS: 9, DISC: 10 },
+  { UT1: 10, HYE_TH: 42, HYE_PR: 12, UT2: 11, AE_TH: 45, AE_PR: 13, ATT: 7, CS_MARKS: 6, DISC: 7 },
 ];
 
 const sunriseNames = ['Ishaan Verma', 'Ananya Rao', 'Vihaan Gupta', 'Diya Kapoor'];

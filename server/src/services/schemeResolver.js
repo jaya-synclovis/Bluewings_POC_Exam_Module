@@ -50,6 +50,8 @@ function reshapeComponent(row, order) {
     type: row.entryType,
     formula: row.formulaConfig || undefined,
     order,
+    group: row.group,
+    role: row.role,
   };
 }
 
@@ -201,6 +203,36 @@ function getRawFieldsForSubject(schoolId, subjectName) {
   );
 }
 
+// Credit Score's raw fields (Attendance, Discipline, ...) PLUS this one
+// (class, subject)'s own Half Yearly and Annual combined fields — Credit
+// Score's default formula blends "20% overall marks across both terms" from
+// exactly these two derived fields, so they need to be selectable building
+// blocks too, not just the plain manual/Bluewings inputs.
+function getCreditScoreAvailableFields(schoolId, className, subjectName) {
+  const rawFields = getRawFieldsForSubject(schoolId, subjectName).map((c) => ({
+    key: c.code,
+    label: c.name,
+    max: c.maxMarks,
+    scope: c.scope,
+    subjectName: c.subjectName ?? null,
+    source: c.source,
+  }));
+  const derived = ['halfYearly', 'annual']
+    .map((role) => getComponentByRoleForClassSubject(schoolId, className, subjectName, role))
+    .filter(Boolean)
+    .map((c) => ({ key: c.code, label: c.name, max: c.maxMarks, scope: 'global', subjectName: null, source: undefined }));
+  return [...rawFields, ...derived];
+}
+
+// Building blocks for Total (Theory) / Total Practical's own formula: every
+// visible component in this (class, subject)'s scheme EXCEPT Credit Score's
+// raw inputs and Credit Score itself (those feed Credit Score, not Total).
+function getTotalFieldBuildingBlocks(schoolId, className, subjectName) {
+  const resolved = resolveScheme(schoolId, className, subjectName, null);
+  if (!resolved) return [];
+  return resolved.components.filter((c) => c.role !== 'creditScoreField' && c.role !== 'creditScore');
+}
+
 // Every (class, subject) combination at this school that has its own Credit
 // Score field — used to decide which schemes a newly added raw field needs
 // linking into.
@@ -229,5 +261,7 @@ module.exports = {
   getSchemeIdForClassSubject,
   getComponentByRoleForClassSubject,
   getRawFieldsForSubject,
+  getCreditScoreAvailableFields,
+  getTotalFieldBuildingBlocks,
   getCreditScoreClassSubjectPairs,
 };

@@ -1,11 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ComponentConfig, ComponentFormula, HalfYearlyConfig } from '../../models/report-card.models';
+import { ComponentConfig, ComponentFormula, FieldFormulaConfig } from '../../models/report-card.models';
 import { AssessmentConfigService } from '../../services/assessment-config.service';
 import { ReportCardService } from '../../services/report-card.service';
 
-type HalfYearlyFormulaType = 'linearCombination' | 'average' | 'sum' | 'bestOfN';
+type FieldFormulaType = 'linearCombination' | 'average' | 'sum' | 'bestOfN';
 
 // One independent draft per formula type so switching the radio button
 // doesn't lose what was already filled in on the other options.
@@ -20,14 +20,22 @@ interface BestOfNDraft {
   normalize: boolean;
 }
 
+// Generic weighted-field configuration panel — reused by Half Yearly, Total
+// (Theory) and Total Practical (each just a differently-scoped weighted
+// combination of other components), distinguished only by `role`. All three
+// share the same generic linearCombination/average/sum/bestOfN formula
+// picker and the same per-(class, subject) selectors.
 @Component({
-  selector: 'app-half-yearly-config',
+  selector: 'app-field-formula-config',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './half-yearly-config.html',
-  styleUrl: './half-yearly-config.css',
+  templateUrl: './field-formula-config.html',
+  styleUrl: './field-formula-config.css',
 })
-export class HalfYearlyConfigComponent implements OnInit {
+export class FieldFormulaConfigComponent implements OnInit, OnChanges {
+  @Input({ required: true }) role!: string;
+  @Input({ required: true }) eyebrow!: string;
+
   private schoolId: number | null = null;
 
   classes = signal<string[]>([]);
@@ -35,8 +43,8 @@ export class HalfYearlyConfigComponent implements OnInit {
   selectedClass = signal<string>('');
   selectedSubject = signal<string>('');
 
-  config = signal<HalfYearlyConfig | undefined>(undefined);
-  formulaType = signal<HalfYearlyFormulaType>('linearCombination');
+  config = signal<FieldFormulaConfig | undefined>(undefined);
+  formulaType = signal<FieldFormulaType>('linearCombination');
   linearDraft = signal<LinearPart[]>([]);
   averageDraft = signal<string[]>([]);
   sumDraft = signal<string[]>([]);
@@ -62,10 +70,17 @@ export class HalfYearlyConfigComponent implements OnInit {
     });
   }
 
+  // `role` never actually changes after creation in practice (each usage is
+  // a separate <app-field-formula-config> tag with a fixed role), but this
+  // keeps the component correct if it ever did.
+  ngOnChanges(): void {
+    this.load();
+  }
+
   private load(): void {
     if (this.schoolId === null || !this.selectedClass() || !this.selectedSubject()) return;
     this.configService
-      .getHalfYearly(this.schoolId, this.selectedClass(), this.selectedSubject())
+      .getFieldConfig(this.schoolId, this.role, this.selectedClass(), this.selectedSubject())
       .subscribe((config) => this.applyConfig(config));
   }
 
@@ -79,7 +94,7 @@ export class HalfYearlyConfigComponent implements OnInit {
     this.load();
   }
 
-  private applyConfig(config: HalfYearlyConfig): void {
+  private applyConfig(config: FieldFormulaConfig): void {
     this.config.set(config);
     const formula = config.component.formula;
     if (formula?.type === 'bestOfN') {
@@ -108,7 +123,7 @@ export class HalfYearlyConfigComponent implements OnInit {
     this.status.set(undefined);
   }
 
-  onTypeChange(type: HalfYearlyFormulaType): void {
+  onTypeChange(type: FieldFormulaType): void {
     this.formulaType.set(type);
     this.markDirty();
   }
@@ -224,10 +239,10 @@ export class HalfYearlyConfigComponent implements OnInit {
       formula = { type: 'bestOfN', of: draft.of, n: draft.n, normalize: draft.normalize };
     }
 
-    this.configService.updateHalfYearly(this.schoolId, this.selectedClass(), this.selectedSubject(), formula).subscribe({
+    this.configService.updateFieldConfig(this.schoolId, this.role, this.selectedClass(), this.selectedSubject(), formula).subscribe({
       next: (config) => {
         this.applyConfig(config);
-        this.status.set({ kind: 'ok', message: 'Saved — First Half now recomputes with this formula.' });
+        this.status.set({ kind: 'ok', message: `Saved — ${config.component.label} now recomputes with this formula.` });
       },
       error: (err) => {
         this.status.set({ kind: 'error', message: err?.error?.error ?? 'Failed to save' });

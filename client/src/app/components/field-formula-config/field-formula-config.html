@@ -1,7 +1,7 @@
 <div class="panel" *ngIf="config() as cfg">
   <div class="panel-header">
     <div>
-      <p class="eyebrow">First Half Configuration</p>
+      <p class="eyebrow">{{ eyebrow }}</p>
       <p class="hint">Choose how {{ cfg.component.label }} is auto-calculated — its value is never typed in directly.</p>
     </div>
     <div class="header-actions">
@@ -30,22 +30,22 @@
     <label class="type-option" [class.active]="formulaType() === 'linearCombination'">
       <input
         type="radio"
-        name="hy-type"
+        [name]="role + '-type'"
         [checked]="formulaType() === 'linearCombination'"
         (change)="onTypeChange('linearCombination')"
       />
       Weighted %
     </label>
     <label class="type-option" [class.active]="formulaType() === 'average'">
-      <input type="radio" name="hy-type" [checked]="formulaType() === 'average'" (change)="onTypeChange('average')" />
+      <input type="radio" [name]="role + '-type'" [checked]="formulaType() === 'average'" (change)="onTypeChange('average')" />
       Average
     </label>
     <label class="type-option" [class.active]="formulaType() === 'sum'">
-      <input type="radio" name="hy-type" [checked]="formulaType() === 'sum'" (change)="onTypeChange('sum')" />
+      <input type="radio" [name]="role + '-type'" [checked]="formulaType() === 'sum'" (change)="onTypeChange('sum')" />
       Total
     </label>
     <label class="type-option" [class.active]="formulaType() === 'bestOfN'">
-      <input type="radio" name="hy-type" [checked]="formulaType() === 'bestOfN'" (change)="onTypeChange('bestOfN')" />
+      <input type="radio" [name]="role + '-type'" [checked]="formulaType() === 'bestOfN'" (change)="onTypeChange('bestOfN')" />
       Best of N
     </label>
   </div>

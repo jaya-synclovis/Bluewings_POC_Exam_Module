@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import {
   ComponentFormula,
   CreditScoreSubjectConfig,
-  HalfYearlyConfig,
+  FieldFormulaConfig,
   NewRawFieldRequest,
   RawField,
 } from '../models/report-card.models';
@@ -15,21 +15,28 @@ export class AssessmentConfigService {
 
   constructor(private readonly http: HttpClient) {}
 
-  // Half Yearly and Credit Score are both configured per (class, subject) —
-  // Class 6 Maths and Class 7 Maths resolve to independent components.
-  getHalfYearly(schoolId: number, className: string, subject: string): Observable<HalfYearlyConfig> {
+  // Half Yearly, Total (Theory), Total Practical and Credit Score are all
+  // configured per (class, subject) — Class 6 Maths and Class 7 Maths
+  // resolve to independent components. The first three share one generic
+  // "weighted field" endpoint, distinguished only by `role`.
+  getFieldConfig(schoolId: number, role: string, className: string, subject: string): Observable<FieldFormulaConfig> {
     const params = { class: className, subject };
-    return this.http.get<HalfYearlyConfig>(`${this.baseUrl}/schools/${schoolId}/half-yearly`, { params });
+    return this.http.get<FieldFormulaConfig>(`${this.baseUrl}/schools/${schoolId}/field-config/${role}`, { params });
   }
 
-  updateHalfYearly(
+  updateFieldConfig(
     schoolId: number,
+    role: string,
     className: string,
     subject: string,
     formula: ComponentFormula
-  ): Observable<HalfYearlyConfig> {
+  ): Observable<FieldFormulaConfig> {
     const params = { class: className, subject };
-    return this.http.put<HalfYearlyConfig>(`${this.baseUrl}/schools/${schoolId}/half-yearly`, { formula }, { params });
+    return this.http.put<FieldFormulaConfig>(
+      `${this.baseUrl}/schools/${schoolId}/field-config/${role}`,
+      { formula },
+      { params }
+    );
   }
 
   getCreditScore(schoolId: number, className: string): Observable<CreditScoreSubjectConfig[]> {

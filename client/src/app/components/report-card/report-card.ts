@@ -101,6 +101,25 @@ export class ReportCard implements OnInit {
     return this.componentsForRow(row).find((c) => c.label === label);
   }
 
+  // Collapses entryComponents' consecutive same-`group` runs into colspan
+  // cells for the grouped header row (e.g. "Half Yearly Exam" spanning its 4
+  // columns) — purely a display grouping, driven entirely by each
+  // component's own `group`, never hardcoded here. Columns with no group sit
+  // in their own ungrouped, blank-label cell.
+  get headerGroups(): { label: string; span: number }[] {
+    const groups: { label: string; span: number }[] = [];
+    for (const column of this.entryComponents) {
+      const label = column.group ?? '';
+      const last = groups[groups.length - 1];
+      if (last && last.label === label && label !== '') {
+        last.span++;
+      } else {
+        groups.push({ label, span: 1 });
+      }
+    }
+    return groups;
+  }
+
   openReportCard(): void {
     this.showReportCard.set(true);
   }

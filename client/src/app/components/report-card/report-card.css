@@ -166,3 +166,14 @@ input[type='number'] {
 .not-applicable {
   color: #c3c6d8;
 }
+
+.group-row th {
+  background: #eef0fd;
+  color: #4f46e5;
+  font-size: 0.72rem;
+}
+
+.group-header {
+  border-left: 1px solid #d7d9e4;
+  border-right: 1px solid #d7d9e4;
+}

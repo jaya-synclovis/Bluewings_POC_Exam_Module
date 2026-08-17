@@ -2,11 +2,13 @@
   <div class="page-header">
     <div>
       <p class="eyebrow">Assessment Structure</p>
-      <h2>First Half &amp; Credit Score</h2>
-      <p class="hint">Configure how these two auto-calculated fields are derived — changes apply live.</p>
+      <h2>Half Yearly, Annual &amp; Credit Score</h2>
+      <p class="hint">Configure how these auto-calculated fields are derived — changes apply live.</p>
     </div>
   </div>
 
-  <app-half-yearly-config></app-half-yearly-config>
+  <app-field-formula-config role="halfYearly" eyebrow="Half Yearly Configuration"></app-field-formula-config>
+  <app-field-formula-config role="totalTheory" eyebrow="Total (Theory) Configuration"></app-field-formula-config>
+  <app-field-formula-config role="totalPractical" eyebrow="Total Practical Configuration"></app-field-formula-config>
   <app-credit-score-config></app-credit-score-config>
 </div>

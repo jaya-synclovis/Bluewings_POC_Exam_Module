@@ -15,9 +15,16 @@ const {
   resolveScheme,
   getSchemeIdForClassSubject,
   getComponentByRoleForClassSubject,
-  getRawFieldsForSubject,
+  getCreditScoreAvailableFields,
+  getTotalFieldBuildingBlocks,
   getCreditScoreClassSubjectPairs,
 } = require('../services/schemeResolver');
+
+// Roles configurable via the generic field-config route — each gets its own
+// Assessment Structure section (Half Yearly Configuration, Total (Theory)
+// Configuration, Total Practical Configuration), all sharing the same
+// generic linearCombination/average/sum/bestOfN formula picker.
+const CONFIGURABLE_FIELD_ROLES = ['halfYearly', 'totalTheory', 'totalPractical'];
 
 const router = express.Router();
 
@@ -99,24 +106,16 @@ function visibleDirectComponents(schoolId, className, subjectName) {
   return resolved.components.filter((c) => c.type === 'direct');
 }
 
-// GET /api/schools/:schoolId/half-yearly?class=&subject=
-router.get('/:schoolId/half-yearly', (req, res) => {
-  const schoolId = Number(req.params.schoolId);
-  if (!getSchool(schoolId)) return res.status(404).json({ error: 'School not found' });
+// Half Yearly only combines direct (raw) fields; Total (Theory) and Total
+// Practical combine other FORMULA fields too (they blend the Half Yearly and
+// Annual combined fields) — see schemeResolver's getTotalFieldBuildingBlocks.
+function availableComponentsForRole(schoolId, className, subjectName, role) {
+  return role === 'halfYearly'
+    ? visibleDirectComponents(schoolId, className, subjectName)
+    : getTotalFieldBuildingBlocks(schoolId, className, subjectName);
+}
 
-  const { class: className, subject: subjectName } = req.query;
-  const component = getComponentByRoleForClassSubject(schoolId, className, subjectName, 'halfYearly');
-  if (!component) {
-    return res.status(404).json({ error: `No Half Yearly field for ${className} ${subjectName}` });
-  }
-
-  res.json({
-    component: componentView(component),
-    availableComponents: visibleDirectComponents(schoolId, className, subjectName),
-  });
-});
-
-function validateHalfYearlyFormula(formula, availableKeys) {
+function validateFieldFormula(fieldLabel, formula, availableKeys) {
   if (formula.type === 'linearCombination') {
     if (!Array.isArray(formula.parts) || formula.parts.length === 0) throw new Error('Select at least one component');
     formula.parts.forEach((part) => {
@@ -141,28 +140,53 @@ function validateHalfYearlyFormula(formula, availableKeys) {
     if (formula.n > formula.of.length) throw new Error('n cannot exceed the number of selected components');
     return;
   }
-  throw new Error(
-    `Half Yearly formula must be 'linearCombination', 'average', 'sum' or 'bestOfN', got '${formula.type}'`
-  );
+  throw new Error(`${fieldLabel} formula must be 'linearCombination', 'average', 'sum' or 'bestOfN', got '${formula.type}'`);
 }
 
-// PUT /api/schools/:schoolId/half-yearly?class=&subject=  { formula }
-router.put('/:schoolId/half-yearly', (req, res) => {
+// GET /api/schools/:schoolId/field-config/:role?class=&subject=
+// Generic config endpoint shared by Half Yearly, Total (Theory) and Total
+// Practical — each is just a differently-scoped weighted combination of
+// other components, resolved generically by role rather than by hardcoded
+// component code.
+router.get('/:schoolId/field-config/:role', (req, res) => {
   const schoolId = Number(req.params.schoolId);
   if (!getSchool(schoolId)) return res.status(404).json({ error: 'School not found' });
 
+  const { role } = req.params;
+  if (!CONFIGURABLE_FIELD_ROLES.includes(role)) return res.status(404).json({ error: `Unknown field role: ${role}` });
+
   const { class: className, subject: subjectName } = req.query;
-  const component = getComponentByRoleForClassSubject(schoolId, className, subjectName, 'halfYearly');
+  const component = getComponentByRoleForClassSubject(schoolId, className, subjectName, role);
   if (!component) {
-    return res.status(404).json({ error: `No Half Yearly field for ${className} ${subjectName}` });
+    return res.status(404).json({ error: `No ${role} field for ${className} ${subjectName}` });
+  }
+
+  res.json({
+    component: componentView(component),
+    availableComponents: availableComponentsForRole(schoolId, className, subjectName, role),
+  });
+});
+
+// PUT /api/schools/:schoolId/field-config/:role?class=&subject=  { formula }
+router.put('/:schoolId/field-config/:role', (req, res) => {
+  const schoolId = Number(req.params.schoolId);
+  if (!getSchool(schoolId)) return res.status(404).json({ error: 'School not found' });
+
+  const { role } = req.params;
+  if (!CONFIGURABLE_FIELD_ROLES.includes(role)) return res.status(404).json({ error: `Unknown field role: ${role}` });
+
+  const { class: className, subject: subjectName } = req.query;
+  const component = getComponentByRoleForClassSubject(schoolId, className, subjectName, role);
+  if (!component) {
+    return res.status(404).json({ error: `No ${role} field for ${className} ${subjectName}` });
   }
 
   const { formula } = req.body;
   if (!formula) return res.status(400).json({ error: 'formula is required' });
 
-  const availableKeys = visibleDirectComponents(schoolId, className, subjectName).map((c) => c.key);
+  const availableKeys = availableComponentsForRole(schoolId, className, subjectName, role).map((c) => c.key);
   try {
-    validateHalfYearlyFormula(formula, availableKeys);
+    validateFieldFormula(component.name, formula, availableKeys);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -170,7 +194,7 @@ router.put('/:schoolId/half-yearly', (req, res) => {
   component.formulaConfig = formula;
   res.json({
     component: componentView(component),
-    availableComponents: visibleDirectComponents(schoolId, className, subjectName),
+    availableComponents: availableComponentsForRole(schoolId, className, subjectName, role),
   });
 });
 
@@ -188,7 +212,7 @@ router.get('/:schoolId/credit-score', (req, res) => {
       return {
         subject: subjectName,
         component: componentView(component),
-        availableFields: getRawFieldsForSubject(schoolId, subjectName).map(rawFieldView),
+        availableFields: getCreditScoreAvailableFields(schoolId, className, subjectName),
       };
     })
     .filter(Boolean);
@@ -235,7 +259,7 @@ router.put('/:schoolId/credit-score/:subject', (req, res) => {
   const { formula } = req.body;
   if (!formula) return res.status(400).json({ error: 'formula is required' });
 
-  const availableKeys = getRawFieldsForSubject(schoolId, subjectName).map((f) => f.code);
+  const availableKeys = getCreditScoreAvailableFields(schoolId, className, subjectName).map((f) => f.key);
   try {
     validateCreditScoreFormula(formula, availableKeys);
   } catch (err) {
@@ -246,7 +270,7 @@ router.put('/:schoolId/credit-score/:subject', (req, res) => {
   res.json({
     subject: subjectName,
     component: componentView(component),
-    availableFields: getRawFieldsForSubject(schoolId, subjectName).map(rawFieldView),
+    availableFields: getCreditScoreAvailableFields(schoolId, className, subjectName),
   });
 });
 
